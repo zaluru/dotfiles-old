@@ -1,0 +1,132 @@
+#!/bin/zsh
+
+# profile file. Runs on login. Environmental variables are set here.
+
+# If you don't plan on reverting to bash, you can remove the link in ~/.profile
+# to clean up.
+
+
+unsetopt PROMPT_SP
+
+# Default programs:
+export EDITOR="emacsclient -t -a ''"
+export VISUAL="emacsclient -c -a emacs"
+export TERMINAL="alacritty"
+export BROWSER="firefox"
+
+# ~/ Clean-up:
+# https://wiki.archlinux.org/title/XDG_Base_Directory#Support
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.local/cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+export XINITRC="${XDG_CONFIG_HOME:-$HOME/.config}/x11/xinitrc"
+#export XAUTHORITY="$XDG_RUNTIME_DIR/Xauthority" # This line will break some DMs.
+export NOTMUCH_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/notmuch-config"
+export GTK2_RC_FILES="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-2.0/gtkrc-2.0"
+export LESSHISTFILE="-"
+
+export WGETRC="${XDG_CONFIG_HOME:-$HOME/.config}/wget/wgetrc"
+# ~/.wget-hsts moved to $XDG_CACHE_HOME/wget-hsts defined inside of wgetrc
+
+export INPUTRC="${XDG_CONFIG_HOME:-$HOME/.config}/shell/inputrc"
+export ZDOTDIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+#export ALSA_CONFIG_PATH="$XDG_CONFIG_HOME/alsa/asoundrc"
+export WINEPREFIX="${XDG_DATA_HOME:-$HOME/.local/share}/wineprefixes/default"
+export KODI_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/kodi"
+export PASSWORD_STORE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/password-store"
+export TMUX_TMPDIR="$XDG_RUNTIME_DIR"
+export ANDROID_SDK_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/android"
+export CARGO_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/cargo"
+export RUSTUP_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/rustup"
+export GOPATH="${XDG_DATA_HOME:-$HOME/.local/share}/go"
+export NIMBLE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nimble"
+export ANSIBLE_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/ansible/ansible.cfg"
+export UNISON="${XDG_DATA_HOME:-$HOME/.local/share}/unison"
+export HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/history"
+export WEECHAT_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/weechat"
+export MBSYNCRC="${XDG_CONFIG_HOME:-$HOME/.config}/mbsync/config"
+export ELECTRUMDIR="${XDG_DATA_HOME:-$HOME/.local/share}/electrum"
+export CUDA_CACHE_PATH="${XDG_CACHE_HOME:-$HOME/.local/cache}/nv" 
+export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
+export ASDF_DATA_DIR="${XDG_DATA_HOME}/asdf"
+export GNUPGHOME="${XDG_DATA_HOME:-$HOME/.local/share}/gnupg"
+
+# Node.js and frontend
+export NVM_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/nvm"
+export NPM_CONFIG_USERCONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/npm/npmrc" 
+export NODE_REPL_HISTORY="${XDG_DATA_HOME:-$HOME/.local/share}/node_repl_history"
+
+# Other program settings:
+#export DICS="/usr/share/stardict/dic/"
+#export SUDO_ASKPASS="$HOME/.local/bin/dmenupass"
+export FZF_DEFAULT_OPTS="--layout=reverse --height 40%"
+#export LESS=-R
+#export LESS_TERMCAP_mb="$(printf '%b' '[1;31m')"
+#export LESS_TERMCAP_md="$(printf '%b' '[1;36m')"
+#export LESS_TERMCAP_me="$(printf '%b' '[0m')"
+#export LESS_TERMCAP_so="$(printf '%b' '[01;44;33m')"
+#export LESS_TERMCAP_se="$(printf '%b' '[0m')"
+#export LESS_TERMCAP_us="$(printf '%b' '[1;32m')"
+#export LESS_TERMCAP_ue="$(printf '%b' '[0m')"
+#export LESSOPEN="| /usr/bin/highlight -O ansi %s 2>/dev/null"
+export QT_QPA_PLATFORMTHEME="gtk2"	# Have QT use gtk2 theme.
+export QT_STYLE_OVERRIDE="Adwaita-dark"	# Have QT use Adwaita
+export MOZ_USE_XINPUT2="1"		# Mozilla smooth scrolling/touchpads.
+export AWT_TOOLKIT="MToolkit wmname LG3D"	#May have to install wmname
+export _JAVA_AWT_WM_NONREPARENTING=1	# Fix for Java applications in tiling window managers
+
+export MANROFFOPT="-c" # required for man with bat to work properly on fedora
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+export XKB_DEFAULT_LAYOUT="pl"
+export VAGRANT_DEFAULT_PROVIDER="libvirt"
+
+
+
+
+#export PATH="$PATH:${$(find ~/.local/bin -type d -printf %p:)%%:}" # for some reason it does not work with greetd
+export PATH="$PATH:$HOME/.local/bin:${XDG_CONFIG_HOME:-$HOME/.config}/emacs/bin:$HOME/.nimble/bin:$GOPATH/bin:/$HOME/.local/share/cargo/bin"
+
+# Set colors for the tty
+source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/tty-theme"
+
+
+# Usefull for distrobox
+command_not_found_handle() {
+ # don't run if not in a container
+ if [ ! -e /run/.containerenv ] &&
+  [ ! -e /.dockerenv ]; then
+  exit 127
+ fi
+
+ if command -v flatpak-spawn >/dev/null 2>&1; then
+  flatpak-spawn --host "${@}"
+ elif command -v host-exec >/dev/null 2>&1; then
+  host-exec "$@"
+ else
+  exit 127
+ fi
+}
+
+if [ -n "${ZSH_VERSION-}" ]; then
+ command_not_found_handler() {
+  command_not_found_handle "$@"
+ }
+fi
+
+#[ ! -f ${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc ] && shortcuts >/dev/null 2>&1 &
+
+#if pacman -Qs libxft-bgra >/dev/null 2>&1; then
+	# Start graphical server on user's current tty if not already running.
+#	[ "$(tty)" = "/dev/tty1" ] && ! pidof -s Xorg >/dev/null 2>&1 && exec startx "$XINITRC"
+#else
+#	echo "\033[31mIMPORTANT\033[0m: Note that \033[32m\`libxft-bgra\`\033[0m must be installed for this build of dwm.
+#Please run:
+#	\033[32myay -S libxft-bgra-git\033[0m
+#and replace \`libxft\`. Afterwards, you may start the graphical server by running \`startx\`."
+#fi
+
+# Switch escape and caps if tty and no passwd required:
+#sudo -n loadkeys ${XDG_DATA_HOME:-$HOME/.local/share}/larbs/ttymaps.kmap 2>/dev/null

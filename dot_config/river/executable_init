@@ -3,7 +3,7 @@
 # Interop #
 #'#########
 gsettings set org.gnome.desktop.default-applications.terminal exec alacritty.desktop
-riverctl spawn "wbg $XDG_PICTURES_DIR/wallpapers/Rainnight.jpg"
+riverctl spawn "wbg $HOME/pictures/wallpapers/Rainnight.jpg"
 riverctl spawn "yambar"
 riverctl spawn "mako"
 
